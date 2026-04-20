@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stop It – Reporte Anónimo</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;900&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue-deep: #0a2463;
+    --blue-mid: #1565c0;
+    --blue-sky: #42a5f5;
+    --blue-light: #bbdefb;
+    --white: #ffffff;
+    --gray-soft: #f0f6ff;
+    --gray-text: #4a5568;
+    --accent: #00bcd4;
+    --danger: #e53935;
+    --success: #43a047;
+    --warning: #fb8c00;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--gray-soft);
+    min-height: 100vh;
+    color: var(--blue-deep);
+  }
+
+  /* PHONE WRAPPER */
+  .phone-frame {
+    max-width: 390px;
+    margin: 20px auto;
+    background: var(--white);
+    border-radius: 40px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(10,36,99,0.25), 0 0 0 8px #e3eaff;
+    min-height: 780px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* STATUS BAR */
+  .status-bar {
+    background: var(--blue-deep);
+    color: white;
+    font-size: 11px;
+    padding: 8px 24px 6px;
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+  }
+
+  /* SCREENS */
+  .screen { display: none; flex-direction: column; flex: 1; }
+  .screen.active { display: flex; }
+
+  /* HEADER */
+  .app-header {
+    background: linear-gradient(135deg, var(--blue-deep) 0%, var(--blue-mid) 100%);
+    padding: 18px 20px 22px;
+    color: white;
+    text-align: center;
+    position: relative;
+  }
+
+  .back-btn {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+  .back-btn:hover { background: rgba(255,255,255,0.35); }
+
+  .app-header .logo-area { display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .shield-logo {
+    width: 42px; height: 42px;
+    background: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.2);
+  }
+  .app-header h1 { font-size: 22px; font-weight: 900; letter-spacing: 1px; }
+  .app-header p { font-size: 12px; opacity: 0.85; margin-top: 2px; }
+
+  /* HOME SCREEN */
+  .home-hero {
+    background: linear-gradient(160deg, var(--blue-deep) 0%, var(--blue-mid) 55%, var(--blue-sky) 100%);
+    padding: 28px 20px 36px;
+    text-align: center;
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+  .home-hero::before {
+    content: '';
+    position: absolute;
+    width: 250px; height: 250px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50%;
+    top: -80px; right: -60px;
+  }
+  .home-hero::after {
+    content: '';
+    position: absolute;
+    width: 150px; height: 150px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 50%;
+    bottom: -30px; left: -30px;
+  }
+
+  .hero-shield {
+    width: 80px; height: 80px;
+    background: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 40px;
+    margin: 0 auto 14px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+    position: relative; z-index: 1;
+    animation: pulse 2.5s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { box-shadow: 0 8px 30px rgba(0,0,0,0.25), 0 0 0 0 rgba(255,255,255,0.3); }
+    50% { box-shadow: 0 8px 30px rgba(0,0,0,0.25), 0 0 0 14px rgba(255,255,255,0); }
+  }
+
+  .hero-title { font-size: 28px; font-weight: 900; letter-spacing: 2px; position: relative; z-index: 1; }
+  .hero-sub { font-size: 13px; opacity: 0.9; margin-top: 4px; position: relative; z-index: 1; }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 11px;
+    margin-top: 10px;
+    position: relative; z-index: 1;
+  }
+
+  /* MENU GRID */
+  .menu-grid {
+    padding: 20px 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .menu-btn {
+    border: none;
+    border-radius: 20px;
+    padding: 20px 12px;
+    cursor: pointer;
+    text-align: center;
+    transition: transform 0.15s, box-shadow 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .menu-btn:active { transform: scale(0.96); }
+  .menu-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: white;
+    opacity: 0;
+    transition: opacity 0.15s;
+    border-radius: 20px;
+  }
+  .menu-btn:hover::after { opacity: 0.1; }
+
+  .menu-btn .btn-icon { font-size: 32px; display: block; margin-bottom: 8px; }
+  .menu-btn .btn-label { font-size: 13px; font-weight: 800; display: block; }
+  .menu-btn .btn-desc { font-size: 10px; opacity: 0.85; display: block; margin-top: 3px; }
+
+  .btn-home { background: linear-gradient(135deg, #1565c0, #0a2463); color: white; box-shadow: 0 6px 20px rgba(21,101,192,0.35); }
+  .btn-report { background: linear-gradient(135deg, #e53935, #b71c1c); color: white; box-shadow: 0 6px 20px rgba(229,57,53,0.35); }
+  .btn-help { background: linear-gradient(135deg, #fb8c00, #e65100); color: white; box-shadow: 0 6px 20px rgba(251,140,0,0.35); }
+  .btn-tips { background: linear-gradient(135deg, #43a047, #1b5e20); color: white; box-shadow: 0 6px 20px rgba(67,160,71,0.35); }
+  .btn-agreements { background: linear-gradient(135deg, #7b1fa2, #4a148c); color: white; box-shadow: 0 6px 20px rgba(123,31,162,0.35); grid-column: 1 / -1; padding: 16px; flex-direction: row; display: flex; align-items: center; gap: 14px; text-align: left; }
+  .btn-agreements .btn-icon { font-size: 28px; margin: 0; }
+  .btn-agreements .btn-text-col { display: flex; flex-direction: column; }
+
+  /* SCREEN CONTENT */
+  .screen-body { padding: 16px; flex: 1; overflow-y: auto; }
+
+  /* REPORT FORM */
+  .anon-badge {
+    background: linear-gradient(90deg, #e8f5e9, #c8e6c9);
+    border: 1px solid #a5d6a7;
+    border-radius: 12px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .anon-badge span { font-size: 12px; color: #2e7d32; font-weight: 700; }
+
+  .form-group { margin-bottom: 14px; }
+  .form-group label { display: block; font-size: 12px; font-weight: 800; color: var(--blue-deep); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .form-group select,
+  .form-group textarea,
+  .form-group input {
+    width: 100%;
+    border: 2px solid var(--blue-light);
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    color: var(--blue-deep);
+    background: white;
+    outline: none;
+    transition: border-color 0.2s;
+    resize: none;
+  }
+  .form-group select:focus,
+  .form-group textarea:focus,
+  .form-group input:focus { border-color: var(--blue-sky); }
+
+  .chip-group { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    border: 2px solid var(--blue-light);
+    background: white;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    color: var(--blue-mid);
+    transition: all 0.15s;
+  }
+  .chip.selected { background: var(--blue-mid); color: white; border-color: var(--blue-mid); }
+
+  .upload-area {
+    border: 2px dashed var(--blue-sky);
+    border-radius: 14px;
+    padding: 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .upload-area:hover { background: #e3f2fd; }
+  .upload-area p { font-size: 12px; color: var(--blue-sky); font-weight: 700; margin-top: 6px; }
+
+  .submit-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--blue-mid), var(--blue-deep));
+    color: white;
+    border: none;
+    border-radius: 16px;
+    padding: 16px;
+    font-size: 15px;
+    font-weight: 900;
+    cursor: pointer;
+    margin-top: 8px;
+    letter-spacing: 0.5px;
+    box-shadow: 0 6px 20px rgba(21,101,192,0.4);
+    transition: transform 0.15s;
+  }
+  .submit-btn:active { transform: scale(0.97); }
+
+  /* HELP SCREEN */
+  .help-card {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 12px;
+    border-left: 5px solid var(--blue-sky);
+    box-shadow: 0 2px 12px rgba(10,36,99,0.08);
+  }
+  .help-card.urgent { border-left-color: var(--danger); }
+  .help-card.medium { border-left-color: var(--warning); }
+  .help-card.calm { border-left-color: var(--success); }
+
+  .help-card h3 { font-size: 14px; font-weight: 800; color: var(--blue-deep); margin-bottom: 6px; }
+  .help-card p { font-size: 12px; color: var(--gray-text); line-height: 1.5; }
+  .help-card .tel { font-size: 15px; font-weight: 900; color: var(--blue-mid); margin-top: 6px; display: block; }
+
+  .big-help-btn {
+    width: 100%;
+    border: none;
+    border-radius: 16px;
+    padding: 18px;
+    font-size: 15px;
+    font-weight: 900;
+    cursor: pointer;
+    margin-bottom: 10px;
+    transition: transform 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .big-help-btn:active { transform: scale(0.97); }
+  .big-help-btn.red { background: linear-gradient(135deg, #e53935, #b71c1c); color: white; box-shadow: 0 6px 20px rgba(229,57,53,0.35); }
+  .big-help-btn.orange { background: linear-gradient(135deg, #fb8c00, #e65100); color: white; box-shadow: 0 6px 20px rgba(251,140,0,0.3); }
+  .big-help-btn.blue { background: linear-gradient(135deg, #1565c0, #0a2463); color: white; box-shadow: 0 6px 20px rgba(21,101,192,0.35); }
+
+  /* TIPS */
+  .tip-card {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 12px rgba(10,36,99,0.08);
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .tip-icon { font-size: 30px; flex-shrink: 0; }
+  .tip-card h3 { font-size: 13px; font-weight: 800; color: var(--blue-deep); margin-bottom: 4px; }
+  .tip-card p { font-size: 12px; color: var(--gray-text); line-height: 1.5; }
+
+  /* AGREEMENTS */
+  .agreement-section {
+    background: white;
+    border-radius: 16px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(10,36,99,0.08);
+  }
+  .agreement-header {
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: background 0.2s;
+  }
+  .agreement-header:hover { background: var(--gray-soft); }
+  .agreement-header .ah-left { display: flex; align-items: center; gap: 10px; }
+  .agreement-header .ah-icon { font-size: 22px; }
+  .agreement-header h3 { font-size: 13px; font-weight: 800; color: var(--blue-deep); }
+  .agreement-header .ah-arrow { font-size: 12px; color: var(--blue-sky); transition: transform 0.25s; }
+  .agreement-header.open .ah-arrow { transform: rotate(180deg); }
+
+  .agreement-body { padding: 0 16px; max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s; }
+  .agreement-body.open { max-height: 600px; padding: 0 16px 14px; }
+  .agreement-body ul { list-style: none; }
+  .agreement-body ul li {
+    padding: 7px 0;
+    border-bottom: 1px solid #f0f6ff;
+    font-size: 12px;
+    color: var(--gray-text);
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    line-height: 1.5;
+  }
+  .agreement-body ul li::before { content: '•'; color: var(--blue-sky); font-weight: 900; flex-shrink: 0; }
+  .agreement-body ul li:last-child { border-bottom: none; }
+
+  .school-badge {
+    background: linear-gradient(135deg, #7b1fa2, #4a148c);
+    color: white;
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+  .school-badge h2 { font-size: 13px; font-weight: 900; }
+  .school-badge p { font-size: 11px; opacity: 0.85; margin-top: 2px; }
+
+  /* SUCCESS MODAL */
+  .modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(10,36,99,0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 30px;
+  }
+  .modal-overlay.show { display: flex; animation: fadeIn 0.3s; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal-box {
+    background: white;
+    border-radius: 24px;
+    padding: 30px 24px;
+    text-align: center;
+    width: 100%;
+    animation: slideUp 0.3s;
+  }
+  @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal-box .modal-icon { font-size: 56px; margin-bottom: 14px; display: block; }
+  .modal-box h2 { font-size: 20px; font-weight: 900; color: var(--blue-deep); margin-bottom: 8px; }
+  .modal-box p { font-size: 13px; color: var(--gray-text); line-height: 1.6; margin-bottom: 20px; }
+  .modal-box button {
+    background: linear-gradient(135deg, var(--blue-mid), var(--blue-deep));
+    color: white;
+    border: none;
+    border-radius: 14px;
+    padding: 13px 32px;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  /* NAV BAR */
+  .nav-bar {
+    background: white;
+    border-top: 1px solid #e3eaff;
+    display: flex;
+    padding: 8px 0 12px;
+    position: sticky;
+    bottom: 0;
+  }
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    padding: 4px 0;
+    border: none;
+    background: none;
+    transition: transform 0.15s;
+  }
+  .nav-item:active { transform: scale(0.92); }
+  .nav-item .nav-icon { font-size: 22px; }
+  .nav-item .nav-label { font-size: 9px; font-weight: 800; color: #90a4ae; text-transform: uppercase; letter-spacing: 0.3px; }
+  .nav-item.active .nav-label { color: var(--blue-mid); }
+  .nav-item.active .nav-icon { filter: drop-shadow(0 2px 4px rgba(21,101,192,0.4)); }
+
+  .section-title {
+    font-size: 15px;
+    font-weight: 900;
+    color: var(--blue-deep);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title span { font-size: 18px; }
+
+  .info-box {
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 14px;
+    font-size: 12px;
+    color: var(--blue-deep);
+    line-height: 1.6;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+<div class="phone-frame">
+
+  <!-- STATUS BAR -->
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>ESRN N.º 34 📶 🔋</span>
+  </div>
+
+  <!-- ══════════ SCREEN: HOME ══════════ -->
+  <div class="screen active" id="screen-home">
+    <div class="home-hero">
+      <div class="hero-shield">🛡️</div>
+      <div class="hero-title">STOP IT</div>
+      <div class="hero-sub">Reporte Anónimo · Comunidad Segura</div>
+      <div class="hero-badge">🔒 Tu identidad siempre está protegida</div>
+    </div>
+
+    <div class="menu-grid">
+      <button class="menu-btn btn-home" onclick="goTo('screen-inicio')">
+        <span class="btn-icon">🏠</span>
+        <span class="btn-label">Inicio</span>
+        <span class="btn-desc">¿Qué es Stop It?</span>
+      </button>
+      <button class="menu-btn btn-report" onclick="goTo('screen-report')">
+        <span class="btn-icon">📣</span>
+        <span class="btn-label">Reportar</span>
+        <span class="btn-desc">Denunciar bullying</span>
+      </button>
+      <button class="menu-btn btn-help" onclick="goTo('screen-help')">
+        <span class="btn-icon">🆘</span>
+        <span class="btn-label">Pedir Ayuda</span>
+        <span class="btn-desc">Apoyo inmediato</span>
+      </button>
+      <button class="menu-btn btn-tips" onclick="goTo('screen-tips')">
+        <span class="btn-icon">💡</span>
+        <span class="btn-label">Consejos</span>
+        <span class="btn-desc">Prevención y respeto</span>
+      </button>
+      <button class="menu-btn btn-agreements" onclick="goTo('screen-agreements')">
+        <span class="btn-icon">📋</span>
+        <div class="btn-text-col">
+          <span class="btn-label">Acuerdos de Convivencia</span>
+          <span class="btn-desc">ESRN N.º 34 · Emilio Pérez – 2025</span>
+        </div>
+      </button>
+    </div>
+
+    <div style="padding: 0 16px 16px;">
+      <div class="info-box">
+        📌 <strong>Recordá:</strong> Todos tenemos el derecho a estudiar en un ambiente seguro y respetuoso. Si ves o vivís una situación de bullying, ¡actuá!
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ SCREEN: INICIO ══════════ -->
+  <div class="screen" id="screen-inicio">
+    <div class="app-header">
+      <button class="back-btn" onclick="goTo('screen-home')">←</button>
+      <div class="logo-area">
+        <div class="shield-logo">🛡️</div>
+        <div>
+          <h1>STOP IT</h1>
+          <p>¿Qué es esta app?</p>
+        </div>
+      </div>
+    </div>
+    <div class="screen-body">
+      <div class="tip-card">
+        <span class="tip-icon">🎯</span>
+        <div>
+          <h3>¿Para qué sirve Stop It?</h3>
+          <p>Stop It es una app de reporte anónimo que permite a niños, adolescentes y adultos expresar libremente situaciones de bullying, violencia o conflictos, para que las autoridades puedan actuar rápido y prevenir daños mayores.</p>
+        </div>
+      </div>
+      <div class="tip-card">
+        <span class="tip-icon">👥</span>
+        <div>
+          <h3>¿Quiénes pueden usarla?</h3>
+          <p>Estudiantes, docentes, familias y toda la comunidad educativa del ESRN N.º 34. Cualquier miembro puede reportar o pedir ayuda en cualquier momento.</p>
+        </div>
+      </div>
+      <div class="tip-card">
+        <span class="tip-icon">🔒</span>
+        <div>
+          <h3>¿Es realmente anónima?</h3>
+          <p>Sí. Nunca pedimos tu nombre ni datos personales. Tu identidad está 100% protegida. Podés expresarte con total confianza.</p>
+        </div>
+      </div>
+      <div class="tip-card">
+        <span class="tip-icon">⚡</span>
+        <div>
+          <h3>¿Cómo ayuda a la escuela?</h3>
+          <p>Permite que las autoridades actúen más rápido, mejora la convivencia escolar y crea un ambiente donde todos se sienten acompañados y seguros.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ SCREEN: REPORT ══════════ -->
+  <div class="screen" id="screen-report">
+    <div class="app-header">
+      <button class="back-btn" onclick="goTo('screen-home')">←</button>
+      <div class="logo-area">
+        <div class="shield-logo">📣</div>
+        <div>
+          <h1>REPORTAR</h1>
+          <p>Todo es anónimo y seguro</p>
+        </div>
+      </div>
+    </div>
+    <div class="screen-body">
+      <div class="anon-badge">
+        <span>🔒</span>
+        <span>REPORTE 100% ANÓNIMO – Tu identidad nunca será revelada</span>
+      </div>
+
+      <div class="form-group">
+        <label>¿Qué tipo de situación es?</label>
+        <div class="chip-group" id="type-chips">
+          <div class="chip" onclick="toggleChip(this)">😠 Bullying verbal</div>
+          <div class="chip" onclick="toggleChip(this)">👊 Bullying físico</div>
+          <div class="chip" onclick="toggleChip(this)">💻 Cyberbullying</div>
+          <div class="chip" onclick="toggleChip(this)">🚫 Exclusión social</div>
+          <div class="chip" onclick="toggleChip(this)">😰 Amenaza</div>
+          <div class="chip" onclick="toggleChip(this)">❓ Otro</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>¿Dónde ocurrió?</label>
+        <select>
+          <option value="">Seleccioná el lugar</option>
+          <option>Aula</option>
+          <option>Recreo / Patio</option>
+          <option>Baños</option>
+          <option>Entrada / Salida de la escuela</option>
+          <option>Redes sociales / Internet</option>
+          <option>Fuera de la escuela</option>
+          <option>Otro lugar</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>¿Cuándo pasó?</label>
+        <select>
+          <option value="">Seleccioná</option>
+          <option>Hoy</option>
+          <option>Ayer</option>
+          <option>Esta semana</option>
+          <option>Hace más tiempo</option>
+          <option>Está pasando ahora</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Contá qué pasó (opcional, con tus palabras)</label>
+        <textarea rows="4" placeholder="Describí la situación. No pongas tu nombre ni datos personales..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>¿Tenés evidencia? (foto, captura de pantalla)</label>
+        <div class="upload-area" onclick="alert('En la app real podés subir una imagen desde tu galería o tomar una foto.')">
+          <div style="font-size: 32px;">📎</div>
+          <p>Tocá para adjuntar imagen o captura</p>
+        </div>
+      </div>
+
+      <button class="submit-btn" onclick="showSuccess()">
+        🚨 ENVIAR REPORTE ANÓNIMO
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════ SCREEN: HELP ══════════ -->
+  <div class="screen" id="screen-help">
+    <div class="app-header">
+      <button class="back-btn" onclick="goTo('screen-home')">←</button>
+      <div class="logo-area">
+        <div class="shield-logo">🆘</div>
+        <div>
+          <h1>PEDIR AYUDA</h1>
+          <p>Estás acompañado/a</p>
+        </div>
+      </div>
+    </div>
+    <div class="screen-body">
+      <div class="section-title"><span>🚨</span> Ayuda inmediata</div>
+
+      <button class="big-help-btn red">🚨 EMERGENCIA – Estoy en peligro</button>
+      <button class="big-help-btn orange">😢 Estoy siendo víctima de bullying</button>
+      <button class="big-help-btn blue">👀 Vi una situación y quiero reportar</button>
+
+      <div style="height: 16px;"></div>
+      <div class="section-title"><span>📞</span> Contactos de apoyo</div>
+
+      <div class="help-card urgent">
+        <h3>🏫 Dirección de la escuela</h3>
+        <p>Podés hablar con el equipo directivo de forma confidencial. Están para ayudarte.</p>
+        <span class="tel">📞 Hablar con Dirección</span>
+      </div>
+
+      <div class="help-card medium">
+        <h3>👩‍🏫 Gabinete / Orientación escolar</h3>
+        <p>El equipo de orientación te escucha y ayuda a resolver conflictos de forma segura.</p>
+        <span class="tel">📞 Pedir turno con Gabinete</span>
+      </div>
+
+      <div class="help-card calm">
+        <h3>💬 Consejo Escolar de Convivencia (CEC)</h3>
+        <p>El CEC está formado por docentes, padres y estudiantes. Pueden ayudarte a resolver la situación.</p>
+        <span class="tel">📋 Ver cómo funciona el CEC</span>
+      </div>
+
+      <div class="help-card">
+        <h3>🤝 Delegado/a de curso</h3>
+        <p>Tu delegado/a puede acompañarte y llevar tu situación al CEC de forma confidencial.</p>
+      </div>
+
+      <div class="info-box">
+        ❤️ <strong>Recordá:</strong> Pedir ayuda es un acto de valentía, no de debilidad. No estás solo/a.
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ SCREEN: TIPS ══════════ -->
+  <div class="screen" id="screen-tips">
+    <div class="app-header">
+      <button class="back-btn" onclick="goTo('screen-home')">←</button>
+      <div class="logo-area">
+        <div class="shield-logo">💡</div>
+        <div>
+          <h1>CONSEJOS</h1>
+          <p>Prevención y convivencia</p>
+        </div>
+      </div>
+    </div>
+    <div class="screen-body">
+      <div class="section-title"><span>🌟</span> Para víctimas de bullying</div>
+      <div class="tip-card">
+        <span class="tip-icon">💪</span>
+        <div>
+          <h3>No te quedes solo/a</h3>
+          <p>Contale a un adulto de confianza: un docente, familiar o el equipo directivo. Pedir ayuda es lo más valiente que podés hacer.</p>
+        </div>
+      </div>
+      <div class="tip-card">
+        <span class="tip-icon">📸</span>
+        <div>
+          <h3>Guardá evidencias</h3>
+          <p>Si es cyberbullying, sacá capturas de pantalla de los mensajes o publicaciones. Eso ayuda a las autoridades a actuar.</p>
+        </div>
+      </div>
+      <div class="tip-card">
+        <span class="tip-icon">🚶</span>
+        <div>
+          <h3>Alejate del conflicto</h3>
+          <p>No respondas a las provocaciones. Alejarte calmadamente te protege y no alimenta la situación.</p>
+        </div>
+      </div>
+
+      <div class="section-title"><span>👁️</span> Si sos testigo</div>
+      <div class="tip-card">
+        <span class="tip-icon">🗣️</span>
+        <div>
+          <h3>Hablá, no te quedes callado/a</h3>
+          <p>Ser testigo y no hacer nada también es parte del problema. Un simple "pará, eso no está bien" puede cambiar todo.</p>
+        </div>
+      </div>
+      <div class="tip-card">
+        <span class="tip-icon">📋</span>
+        <div>
+          <h3>Usá esta app para reportar</h3>
+          <p>Podés reportar lo que viste de forma anónima. Ayudás a quien lo sufre sin ponerte en riesgo.</p>
+        </div>
+      </div>
+
+      <div class="section-title"><span>🤝</span> Para todos</div>
+      <div class="tip-card">
+        <span class="tip-icon">❤️</span>
+        <div>
+          <h3>El respeto es la base</h3>
+          <p>Tratá a los demás como querés que te traten a vos. El diálogo y la empatía construyen la convivencia.</p>
+        </div>
+      </div>
+      <div class="tip-card">
+        <span class="tip-icon">🌈</span>
+        <div>
+          <h3>La diversidad nos enriquece</h3>
+          <p>Todos somos diferentes en ideas, gustos y formas de ser. Esa diversidad es una riqueza para la comunidad.</p>
+        </div>
+      </div>
+      <div class="tip-card">
+        <span class="tip-icon">🔊</span>
+        <div>
+          <h3>Tu voz importa</h3>
+          <p>En nuestra escuela, todos tienen derecho a ser escuchados sin importar su edad, género o ideas.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ SCREEN: AGREEMENTS ══════════ -->
+  <div class="screen" id="screen-agreements">
+    <div class="app-header">
+      <button class="back-btn" onclick="goTo('screen-home')">←</button>
+      <div class="logo-area">
+        <div class="shield-logo">📋</div>
+        <div>
+          <h1>CONVIVENCIA</h1>
+          <p>Acuerdos escolares 2025</p>
+        </div>
+      </div>
+    </div>
+    <div class="screen-body">
+      <div class="school-badge">
+        <h2>ESRN N.º 34 – EMILIO PEREZ</h2>
+        <p>Ingeniero Huergo · Río Negro · 2025</p>
+      </div>
+
+      <div class="info-box">
+        💬 <em>"A los jóvenes se les debe enseñar a construir, por medio de la duda y la investigación, un pensamiento propio y crítico."</em>
+      </div>
+
+      <!-- HORARIOS -->
+      <div class="agreement-section">
+        <div class="agreement-header" onclick="toggleAgreement(this)">
+          <div class="ah-left">
+            <span class="ah-icon">⏰</span>
+            <h3>Horarios y asistencia</h3>
+          </div>
+          <span class="ah-arrow">▼</span>
+        </div>
+        <div class="agreement-body">
+          <ul>
+            <li>El ingreso debe ser puntual para todos los estudiantes.</li>
+            <li>El estudiante debe permanecer en el establecimiento durante las horas de clase.</li>
+            <li>Solo podrá retirarse con la presencia de un padre o tutor, solicitando permiso en dirección.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- PRESENTACIÓN -->
+      <div class="agreement-section">
+        <div class="agreement-header" onclick="toggleAgreement(this)">
+          <div class="ah-left">
+            <span class="ah-icon">👕</span>
+            <h3>Presentación e indumentaria</h3>
+          </div>
+          <span class="ah-arrow">▼</span>
+        </div>
+        <div class="agreement-body">
+          <ul>
+            <li>Todos deben presentarse en óptimas condiciones de higiene personal.</li>
+            <li>No se permite indumentaria inadecuada: ojotas de playa, gorras para el sol, capucha, transparencias.</li>
+            <li>Uniforme: remera lisa gris/blanca con logo de la escuela, guardapolvo, pantalón largo o capri ¾.</li>
+            <li>Los alumnos de 5to año podrán usar remera de egresados.</li>
+            <li>No se permite concurrir a Educación Física con alhajas por seguridad.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- CONDUCTA -->
+      <div class="agreement-section">
+        <div class="agreement-header" onclick="toggleAgreement(this)">
+          <div class="ah-left">
+            <span class="ah-icon">🤝</span>
+            <h3>Conducta y convivencia</h3>
+          </div>
+          <span class="ah-arrow">▼</span>
+        </div>
+        <div class="agreement-body">
+          <ul>
+            <li>Los estudiantes deben realizar las actividades en forma ordenada.</li>
+            <li>No se permite que los estudiantes estén fuera de la escuela durante el horario escolar.</li>
+            <li>Los recreos son necesarios: los estudiantes deben salir del aula durante su desarrollo.</li>
+            <li>Solo durante el recreo se pueden consumir bebidas y alimentos.</li>
+            <li>No se permite fumar ni en el interior ni exterior del establecimiento (Ley 23.344).</li>
+            <li>El lenguaje debe ser adecuado, sin discriminación social, ética ni religiosa.</li>
+            <li>Las agresiones físicas o verbales NO se permitirán ni se justificarán bajo ningún concepto.</li>
+            <li>El respeto por los símbolos patrios es obligatorio.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- PATRIMONIO -->
+      <div class="agreement-section">
+        <div class="agreement-header" onclick="toggleAgreement(this)">
+          <div class="ah-left">
+            <span class="ah-icon">🏫</span>
+            <h3>Cuidado del patrimonio escolar</h3>
+          </div>
+          <span class="ah-arrow">▼</span>
+        </div>
+        <div class="agreement-body">
+          <ul>
+            <li>La escuela es de todos y entre todos la cuidamos.</li>
+            <li>En caso de rotura intencionada, se debe reponer o reparar el elemento dañado.</li>
+            <li>Si se raya una mesa, silla, libro o pared, se debe borrar o reparar.</li>
+            <li>El material didáctico debe ser devuelto a la biblioteca al término de la clase.</li>
+            <li>Los equipos multimedia deben ser retirados y devueltos por el docente encargado.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- GENERAL -->
+      <div class="agreement-section">
+        <div class="agreement-header" onclick="toggleAgreement(this)">
+          <div class="ah-left">
+            <span class="ah-icon">📌</span>
+            <h3>Cuestiones generales</h3>
+          </div>
+          <span class="ah-arrow">▼</span>
+        </div>
+        <div class="agreement-body">
+          <ul>
+            <li>Cada uno es responsable de sus propios actos.</li>
+            <li>El estudiante debe traer el material necesario para cada espacio curricular.</li>
+            <li>No se permite traer cuters a la escuela por razones de seguridad.</li>
+            <li>El uso del celular en horario escolar debe estar justificado pedagógicamente.</li>
+            <li>Docentes y estudiantes son responsables por los objetos personales que lleven a la escuela.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- SANCIONES -->
+      <div class="agreement-section">
+        <div class="agreement-header" onclick="toggleAgreement(this)">
+          <div class="ah-left">
+            <span class="ah-icon">⚖️</span>
+            <h3>Tipos de faltas y sanciones</h3>
+          </div>
+          <span class="ah-arrow">▼</span>
+        </div>
+        <div class="agreement-body">
+          <ul>
+            <li><strong>Faltas leves:</strong> cuando la conducta amerite un cambio de actitud o vocabulario.</li>
+            <li><strong>Faltas graves:</strong> cuando hay intencionalidad de causar daño o reincidencia en falta leve.</li>
+            <li><strong>Faltas muy graves:</strong> violencia física o psicológica, robo, hurto, reiteración de faltas graves o cualquier forma de delito.</li>
+            <li><strong>Sanción reparatoria:</strong> si se hizo un daño moral o material, se propone una reparación.</li>
+            <li><strong>Contrato de cambio:</strong> apunta al cambio de conducta con un plazo de prueba.</li>
+            <li><strong>Sanción experiencial:</strong> trabajos comunitarios o charlas sobre temáticas de prevención.</li>
+            <li>Siempre se comunicará a los padres/tutores. El CEC determina la gravedad del hecho.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- CEC -->
+      <div class="agreement-section">
+        <div class="agreement-header" onclick="toggleAgreement(this)">
+          <div class="ah-left">
+            <span class="ah-icon">🏛️</span>
+            <h3>Consejo Escolar de Convivencia (CEC)</h3>
+          </div>
+          <span class="ah-arrow">▼</span>
+        </div>
+        <div class="agreement-body">
+          <ul>
+            <li>Representado por docentes, padres, estudiantes y al menos un miembro del equipo directivo.</li>
+            <li>Los representantes son elegidos por votación anual.</li>
+            <li>Sesiones ordinarias cada 3 meses para tratar temas de convivencia.</li>
+            <li>Sesiones extraordinarias en casos graves o cuando la dirección lo considere necesario.</li>
+            <li>Los AEC se revisan cada año al inicio del ciclo lectivo.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="info-box" style="margin-top: 4px;">
+        🌿 <strong>Recordá:</strong> Estos acuerdos fueron construidos entre todos — estudiantes, docentes y familias — usando el diálogo como herramienta principal.
+      </div>
+    </div>
+  </div>
+
+  <!-- NAV BAR -->
+  <div class="nav-bar" id="main-nav">
+    <button class="nav-item active" id="nav-home" onclick="goTo('screen-home')">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-label">Inicio</span>
+    </button>
+    <button class="nav-item" id="nav-report" onclick="goTo('screen-report')">
+      <span class="nav-icon">📣</span>
+      <span class="nav-label">Reportar</span>
+    </button>
+    <button class="nav-item" id="nav-help" onclick="goTo('screen-help')">
+      <span class="nav-icon">🆘</span>
+      <span class="nav-label">Ayuda</span>
+    </button>
+    <button class="nav-item" id="nav-tips" onclick="goTo('screen-tips')">
+      <span class="nav-icon">💡</span>
+      <span class="nav-label">Consejos</span>
+    </button>
+    <button class="nav-item" id="nav-agreements" onclick="goTo('screen-agreements')">
+      <span class="nav-icon">📋</span>
+      <span class="nav-label">Normas</span>
+    </button>
+  </div>
+
+  <!-- SUCCESS MODAL -->
+  <div class="modal-overlay" id="successModal">
+    <div class="modal-box">
+      <span class="modal-icon">✅</span>
+      <h2>¡Reporte enviado!</h2>
+      <p>Tu reporte anónimo fue enviado correctamente. Las autoridades de la escuela lo recibirán y actuarán para ayudarte. <strong>Tu identidad está 100% protegida.</strong></p>
+      <button onclick="closeModal()">Volver al inicio</button>
+    </div>
+  </div>
+
+</div><!-- /phone-frame -->
+
+<script>
+  const screens = ['screen-home','screen-inicio','screen-report','screen-help','screen-tips','screen-agreements'];
+  const navMap = { 'screen-home':'nav-home', 'screen-report':'nav-report', 'screen-help':'nav-help', 'screen-tips':'nav-tips', 'screen-agreements':'nav-agreements' };
+
+  function goTo(id) {
+    screens.forEach(s => {
+      const el = document.getElementById(s);
+      el.classList.remove('active');
+    });
+    document.getElementById(id).classList.add('active');
+
+    // update nav
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    if (navMap[id]) document.getElementById(navMap[id]).classList.add('active');
+  }
+
+  function toggleChip(el) {
+    el.classList.toggle('selected');
+  }
+
+  function toggleAgreement(header) {
+    header.classList.toggle('open');
+    const body = header.nextElementSibling;
+    body.classList.toggle('open');
+  }
+
+  function showSuccess() {
+    document.getElementById('successModal').classList.add('show');
+  }
+
+  function closeModal() {
+    document.getElementById('successModal').classList.remove('show');
+    goTo('screen-home');
+  }
+</script>
+</body>
+</html>
