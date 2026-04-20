@@ -652,9 +652,9 @@
     <div class="screen-body">
       <div class="section-title"><span>🚨</span> Ayuda inmediata</div>
 
-      <button class="big-help-btn red">🚨 EMERGENCIA – Estoy en peligro</button>
-      <button class="big-help-btn orange">😢 Estoy siendo víctima de bullying</button>
-      <button class="big-help-btn blue">👀 Vi una situación y quiero reportar</button>
+      <button class="big-help-btn red" onclick="showHelpModal('emergency')">🚨 EMERGENCIA – Estoy en peligro</button>
+      <button class="big-help-btn orange" onclick="showHelpModal('victim')">😢 Estoy siendo víctima de bullying</button>
+      <button class="big-help-btn blue" onclick="showHelpModal('witness')">👀 Vi una situación y quiero reportar</button>
 
       <div style="height: 16px;"></div>
       <div class="section-title"><span>📞</span> Contactos de apoyo</div>
@@ -960,6 +960,13 @@
     </button>
   </div>
 
+  <!-- HELP MODAL -->
+  <div class="modal-overlay" id="helpModal">
+    <div class="modal-box" id="helpModalBox">
+      <!-- filled by JS -->
+    </div>
+  </div>
+
   <!-- SUCCESS MODAL -->
   <div class="modal-overlay" id="successModal">
     <div class="modal-box">
@@ -996,6 +1003,60 @@
     header.classList.toggle('open');
     const body = header.nextElementSibling;
     body.classList.toggle('open');
+  }
+
+  const helpContent = {
+    emergency: {
+      icon: '🚨',
+      title: '¡Pedí ayuda ahora!',
+      color: '#e53935',
+      msg: 'Si estás en peligro inmediato, avisá a un adulto de confianza lo antes posible. Podés ir a dirección, hablar con un docente o llamar al 911.',
+      actions: [
+        { label: '📞 Llamar al 911', fn: "window.location.href='tel:911'" },
+        { label: '🏫 Ir a Dirección', fn: "closeHelpModal();goTo('screen-report')" },
+        { label: '📣 Hacer un reporte anónimo', fn: "closeHelpModal();goTo('screen-report')" }
+      ]
+    },
+    victim: {
+      icon: '😢',
+      title: 'No estás solo/a',
+      color: '#fb8c00',
+      msg: 'Sabemos que no es fácil. Podés hablar con el gabinete escolar, tu delegado/a o hacer un reporte anónimo. Alguien siempre puede ayudarte.',
+      actions: [
+        { label: '📣 Hacer un reporte anónimo', fn: "closeHelpModal();goTo('screen-report')" },
+        { label: '👩‍🏫 Hablar con el gabinete', fn: "closeHelpModal()" },
+        { label: '💡 Ver consejos', fn: "closeHelpModal();goTo('screen-tips')" }
+      ]
+    },
+    witness: {
+      icon: '👀',
+      title: 'Tu ayuda importa',
+      color: '#1565c0',
+      msg: 'Reportar lo que viste es un acto de valentía. Podés hacerlo de forma anónima y completamente segura. Tu reporte puede cambiar la situación de alguien.',
+      actions: [
+        { label: '📣 Reportar de forma anónima', fn: "closeHelpModal();goTo('screen-report')" },
+        { label: '💡 Ver consejos para testigos', fn: "closeHelpModal();goTo('screen-tips')" }
+      ]
+    }
+  };
+
+  function showHelpModal(type) {
+    const c = helpContent[type];
+    const btns = c.actions.map(a =>
+      `<button onclick="${a.fn}" style="width:100%;border:none;border-radius:12px;padding:12px;font-size:13px;font-weight:800;cursor:pointer;margin-bottom:8px;background:${c.color};color:white;font-family:'Nunito',sans-serif;">${a.label}</button>`
+    ).join('');
+    document.getElementById('helpModalBox').innerHTML = `
+      <span class="modal-icon">${c.icon}</span>
+      <h2 style="color:${c.color}">${c.title}</h2>
+      <p>${c.msg}</p>
+      <div style="margin-bottom:8px">${btns}</div>
+      <button onclick="closeHelpModal()" style="background:none;border:2px solid #ddd;border-radius:12px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;color:#666;font-family:'Nunito',sans-serif;">Cerrar</button>
+    `;
+    document.getElementById('helpModal').classList.add('show');
+  }
+
+  function closeHelpModal() {
+    document.getElementById('helpModal').classList.remove('show');
   }
 
   function showSuccess() {
